@@ -16,7 +16,7 @@ function App() {
 
     return (
         <div className="App">
-            {crosses.map((cross, index) => <Cross key={index} url={buildUrl(cross)} id={Object.values(cross).join("-")}/>)}
+            {crosses.reverse().map((cross, index) => <Cross key={index} url={buildUrl(cross)} id={Object.values(cross).join("-")}/>)}
         </div>
     );
 }
