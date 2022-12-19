@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react";
 import ImagePlaceholder from "../common/ImagePlaceholder";
 import {IncomingWebSocketMessage} from "../common";
-import {Button} from "@mui/material";
 
 function Cross(props: { url: string, id: string }) {
     const [svg, setSvg] = useState<string>("")
     const [phase, setPhase] = useState<number>(1)
+    const [description, setDescription] = useState<string>("")
 
     useEffect(() => {
         const ws = new WebSocket(props.url)
@@ -18,7 +18,9 @@ function Cross(props: { url: string, id: string }) {
                     if ("svg" in data.data) {
                         setSvg(data.data.svg ?? "")
                     }
-                    // setId(data.data.)
+                    if ("state" in data.data) {
+                        setDescription(data.data.state?.name ?? "")
+                    }
                     break;
                 case "phase" :
                     setPhase(data.data.dk?.fdk ?? 1)
@@ -33,9 +35,30 @@ function Cross(props: { url: string, id: string }) {
         ws.onclose = console.log
     }, [props.url])
 
+    const decodePhase = (phaseNum: number): string | number => {
+        switch (phaseNum) {
+            case 0:
+                return "ЛР"
+            case 9:
+            case 13:
+                return "Пром. такт"
+            case 10:
+            case 14:
+                return "ЖМ"
+            case 11:
+            case 15:
+                return "ОС"
+            case 12:
+                return "КК"
+            default:
+                return phaseNum
+        }
+    }
+
     return (
         <div>
-            <Button variant="outlined" onClick={() => setPhase(phase + 1)}>hui</Button>
+            <div style={{fontSize: 13}}>{description}</div>
+            <div style={{fontSize: 20}}>Фаза {decodePhase(phase)}</div>
             <ImagePlaceholder svg={svg} phase={phase} id={props.id}/>
         </div>
     )

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import {Position} from "../common";
 import Cross from "../features/Cross";
+import {Grid} from '@mui/material';
 
 function buildUrl(pos: Position) {
     if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
@@ -13,10 +14,32 @@ function buildUrl(pos: Position) {
 
 function App() {
     const crosses: Position[] = JSON.parse(localStorage.getItem("multipleCross") ?? "[]")
+    const middle = Math.round(crosses.length / 2)
+
+    useEffect(() => {window.onbeforeunload = () => localStorage.removeItem("multipleCross")}, [])
 
     return (
         <div className="App">
-            {crosses.reverse().map((cross, index) => <Cross key={index} url={buildUrl(cross)} id={Object.values(cross).join("-")}/>)}
+            <Grid
+                container
+                direction="row"
+                justifyContent="space-evenly"
+                alignItems="center"
+            >
+                {crosses.slice(0, middle).map((cross, index) =>
+                    <Cross key={index} url={buildUrl(cross)} id={Object.values(cross).join("-")}/>)
+                }
+            </Grid>
+            <Grid
+                container
+                direction="row"
+                justifyContent="space-evenly"
+                alignItems="center"
+            >
+                {crosses.slice(middle).map((cross, index) =>
+                    <Cross key={index + middle} url={buildUrl(cross)} id={Object.values(cross).join("-")}/>)
+                }
+            </Grid>
         </div>
     );
 }
